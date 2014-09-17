@@ -45,7 +45,6 @@ function clearTransStyle(elem){
   setTrans(elem, "");
 }
 
-
 var snapthreshold = 15; // CSS pixels vertical snap threshold
 
 window.onload = function(){
@@ -58,6 +57,7 @@ window.onload = function(){
   var itemlocationdata; // this is an example of some state that should have
                         // better structure but which doesn't because I wanted
                         // to keep the implementation short and simple
+  var currentindex; // the index that dragging item is poised for insertion at
   // end state relevant to dragging li's in the ul
 
   // I want to use jQuery -- so far I would have used it to double up on the 
@@ -67,7 +67,6 @@ window.onload = function(){
   $('ul').addEventListener("mousedown", function(event){
     dragging = parentIsTag(event.target, "LI");
     if(!dragging) return;
-    dragging.className = "item dragging";
     dragitemwidth = dragging.offsetWidth;
     pos = [event.clientX, event.clientY];
     dragitemstartx = dragging.getBoundingClientRect().left -
@@ -94,16 +93,19 @@ window.onload = function(){
 
     // cache the layout of the list in a variable once per mouse interaction 
     // (rather than accessing the DOM in a loop once per mouse movement!)
-    itemlocationdata = toArray($('ul').children).map(function(x){
-      if (x == dragging) return "dragged";
+    itemlocationdata = toArray($('ul').children).map(function(li){
+      // ensures notransition is not set on all the li's
+      li.className = "item";
+      if (li == dragging) return "dragged";
       // do note that doc.body.gBCR cannot be cached, suppose the zoom of the 
       // page changes or the page is scrolled while zoomed in (Safari!), all the
       // BCR coordinates change. This computed difference, however, conveniently 
       // remains constant in CSS-pixels.
-      var xBCR = x.getBoundingClientRect();
+      var xBCR = li.getBoundingClientRect();
       var thisitemcenter = (xBCR.left + xBCR.right)/2 - document.body.getBoundingClientRect().left;
-      return {el: x, wasAfter: thisitemcenter > dragitemstartx, center: thisitemcenter};
+      return {el: li, wasAfter: thisitemcenter > dragitemstartx, center: thisitemcenter};
     });
+    dragging.className = "item dragging";
     l('itemlocationdata', itemlocationdata);
     return false;
   }, false);
@@ -115,13 +117,14 @@ window.onload = function(){
     // correct the positioning of the remaining items by using transform
     setTransStyle(dragging, offset[0], unsnapped?offset[1]:0, 100);
     if (!unsnapped) {
-      l('x', offset[0]);
       // This next for loop can be optimized! (loops thru the cached item list 
       // each mousemove)
       // We can optimize this by only searching the range that the last two mouse 
       // positions have traversed. However, the additional complexity will cause 
       // it to be slower overall when there is a small number of items in the 
       // bookmarklist.
+      var tmpdeleteme = [];
+      currentindex = -1; // -1 means not dragged far enough to rearrange anything
       for (var i=itemlocationdata.length; i--;) {
         // for items starting on the right side, if the right side of dragged is 
         // > their middle, send it to the minus position.
@@ -133,17 +136,22 @@ window.onload = function(){
         if (ii.wasAfter) {
           if (offset[0] + dragitemstartx + dragitemwidth > ii.center) {
             setTransStyle(ii.el, -dragitemwidth, 0);
+            currentindex = currentindex < i ? i : currentindex;
           } else {
             setTransStyle(ii.el, 0, 0);
           }
         } else {
           if (offset[0] + dragitemstartx < ii.center) {
             setTransStyle(ii.el, dragitemwidth, 0);
+            currentindex = i;
+            // not as complicated as the other assignment of currentindex due to
+            // the iteration order of the loop
           } else {
             setTransStyle(ii.el, 0, 0);
           }
         }
       }
+      l('ci', currentindex);
     } else {
       // move all the "after" items to their minus position because I have 
       // unsnapped the draggable
@@ -161,10 +169,10 @@ window.onload = function(){
 
   document.addEventListener("mouseup", function(event){
     if (dragging) {
-      dragging.className = "item";
+      dragging.className = "item"; // clears dragging class
       // apply the positioning of all items by actually moving them and 
       // zeroing/clearing their transform styles
-      if (unsnapped) {
+      if (unsnapped || currentindex == -1) {
         for (var i = itemlocationdata.length; i--;) {
           var ii = itemlocationdata[i];
           if (ii == "dragged") continue;
@@ -172,8 +180,30 @@ window.onload = function(){
         }
         clearTransStyle(dragging);
       } else {
-        // now we gotta do some shuffling around
+        // now we gotta do some shuffling around:
+        // first disable the transitions/animation, then remove the transform 
+        // styles and physically move the dragged item in the DOM (they should 
+        // remain in the same exact positions visually)
+        var startindex;
+        for (i = itemlocationdata.length; i--;) {
+          ii = itemlocationdata[i];
+          if (ii == "dragged") { startindex = i; continue; }
+          ii.el.className = "item notransition";
+          clearTransStyle(ii.el);
+        }
 
+        // the only tricky bit is getting the dragged item's animation to behave
+        // in a sane fashion -- this requires it to get DOM-moved into place, 
+        // with the transform correspondingly warped using notransition class, 
+        // and then switched back on and re-transitioned to a transform of zero, 
+        // so we do have to do window.getComputedStyle() madness here.
+
+        // following comment applies for the non-dragged items...
+        // We can force-apply the styles (allow browser to evaluate styles) 
+        // using window.getComputedStyle(), but since we're done (i.e. no other 
+        // styles need to be set on these elements *right now*), this can also 
+        // be skipped.
+        // The notransition class is eventually cleared; no need to do it here.
       }
       dragging = false;
       return false;

@@ -36,6 +36,12 @@
       -webkit-transition: -webkit-transform 0.5s ease;
     }
 
+    .item.notransition
+    {
+      transition: none;
+      -webkit-transition: none;
+    }
+
     .item h2
     {
       font: inherit;
@@ -66,7 +72,8 @@
       background: hsl(0, 0%, 70%);
     }
 
-    ul {
+    ul
+    {
       /* Needed for Chrome to obey z coverage */
       transform-style: preserve-3d;
       -webkit-user-select: none;
