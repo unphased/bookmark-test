@@ -1,69 +1,75 @@
 <!doctype html>
-<title>Bookmark bar</title>
-<meta charset=utf-8>
-<style>
+<html>
+  <head>
+    <title>Bookmark bar</title>
+    <meta charset=utf-8>
+    <style>
 
-html,
-body
-{
-  font: menu;
-  margin: 0;
-  padding: 0;
-  -webkit-user-select: none;
-}
+    html,
+    body
+    {
+      font: menu;
+      margin: 0;
+      padding: 0;
+      -webkit-user-select: none;
+    }
 
 #bookmark-bar
-{
-  position: absolute;
-  height: 30px;
-  top: 100px;
-  left: 100px;
-  right: 100px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  background: hsl(0, 0%, 90%);
-}
+    {
+      position: absolute;
+      height: 30px;
+      top: 100px;
+      left: 100px;
+      right: 100px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      background: hsl(0, 0%, 90%);
+    }
 
-.item
-{
-  display: inline-block;
-  height: 20px;
-  padding: 0;
-  margin: 0;
-}
+    .item
+    {
+      display: inline-block;
+      height: 20px;
+      padding: 0;
+      margin: 0;
+    }
 
-.item h2
-{
-  font: inherit;
-  position: relative;
-  margin: 4px 0;
-  padding: 0 7px 0 26px;
-  height: 22px;
-  line-height: 22px;
-}
+    .item h2
+    {
+      font: inherit;
+      position: relative;
+      margin: 4px 0;
+      padding: 0 7px 0 26px;
+      height: 22px;
+      line-height: 22px;
+    }
 
-.item h2::before
-{
-  content: "";
-  display: block;
-  position: absolute;
-  height: 16px;
-  width: 16px;
-  top: 3px;
-  left: 7px;
-  background: hsl(0, 0%, 70%);
-}
+    .item h2::before
+    {
+      content: "";
+      display: block;
+      position: absolute;
+      height: 16px;
+      width: 16px;
+      top: 3px;
+      left: 7px;
+      background: hsl(0, 0%, 70%);
+    }
 
-</style>
-<ul id=bookmark-bar>
-  <li class=item><h2></h2>
-  <li class=item><h2></h2>
-  <li class=item><h2></h2>
-  <li class=item><h2>foo</h2>
-  <li class=item><h2>foo bar</h2>
-  <li class=item><h2>a long foo bar</h2>
-  <li class=item><h2>a very long foo bar foo bar</h2>
-  <li class=item><h2>foo foo</h2>
-  <li class=item><h2>bar bar</h2>
-</ul>
+    </style>
+  </head>
+  <body>
+    <ul id=bookmark-bar>
+      <li class=item><h2></h2>
+      <li class=item><h2></h2>
+      <li class=item><h2></h2>
+      <li class=item><h2>foo</h2>
+      <li class=item><h2>foo bar</h2>
+      <li class=item><h2>a long foo bar</h2>
+      <li class=item><h2>a very long foo bar foo bar</h2>
+      <li class=item><h2>foo foo</h2>
+      <li class=item><h2>bar bar</h2>
+    </ul>
+  </body>
+</html>
