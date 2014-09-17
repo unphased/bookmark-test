@@ -22,11 +22,22 @@ function toArray(obj) {
 }
 
 // not very generally useful helper due to no jQuery
-function parentIsTag(domelem, tag) {
+function parentIsTag(domelem, tag){
   do {
     if (!domelem || domelem.tagName == tag)
       return domelem;
   } while(domelem = domelem.parentNode);
+}
+
+function setTrans(elem, style){
+  elem.style.transform = elem.style['-webkit-transform'] = style;
+}
+function transStyle(x, y, z){
+  return "translate3d("+x+"px,"+y+"px,"+z+"px)";
+}
+function setTransStyle(elem, x, y, z){
+  z = z || 0;
+  setTrans(elem, transStyle(x, y, z));
 }
 
 var snapthreshold = 15; // CSS pixels vertical snap threshold
@@ -45,6 +56,8 @@ window.onload = function(){
   // touchstart
   $('ul').addEventListener("mousedown", function(event){
     dragging = parentIsTag(event.target, "LI");
+    if(!dragging) return;
+    dragging.className = "item dragging";
     dragitemwidth = dragging.offsetWidth;
     pos = [event.clientX, event.clientY];
     dragitemstartx = dragging.getBoundingClientRect().left -
@@ -77,8 +90,9 @@ window.onload = function(){
       // page changes or the page is scrolled while zoomed in (Safari!), all the
       // BCR coordinates change. This computed difference, however, conveniently 
       // remains constant in CSS-pixels.
-      var thisitempos = x.getBoundingClientRect().left - document.body.getBoundingClientRect().left;
-      return {el: x, wasAfter: thisitempos > dragitemstartx, pos: thisitempos};
+      var xBCR = x.getBoundingClientRect();
+      var thisitemcenter = (xBCR.left + xBCR.right)/2 - document.body.getBoundingClientRect().left;
+      return {el: x, wasAfter: thisitemcenter > dragitemstartx, center: thisitemcenter};
     });
     l('itemlocationdata', itemlocationdata);
     return false;
@@ -89,20 +103,54 @@ window.onload = function(){
     var offset = [event.clientX - pos[0], event.clientY - pos[1]];
     unsnapped = Math.abs(offset[1]) > snapthreshold;
     // correct the positioning of the remaining items by using transform
-    dragging.style.transform = dragging.style['-webkit-transform'] =
-      "translate3d("+offset[0]+"px,"+(unsnapped?offset[1]:0)+"px,0)";
-    if (!unsnapped) { l('x', offset[0]); }
-    // this can be optimized! (loops thru the cached item list each mousemove)
-    // we can optimize this by only searching the range that the last two mouse 
-    // positions have traversed. However, the additional complexity will cause 
-    // it to be slower overall when there is a small number of items in the 
-    // bookmarklist.
-    for (var i=itemlocationdata.length; i--;) {
-      // if the right side of dragged is past the middle, send it to minus
+    setTransStyle(dragging, offset[0], unsnapped?offset[1]:0, 100);
+    if (!unsnapped) {
+      l('x', offset[0]);
+      // This next for loop can be optimized! (loops thru the cached item list 
+      // each mousemove)
+      // We can optimize this by only searching the range that the last two mouse 
+      // positions have traversed. However, the additional complexity will cause 
+      // it to be slower overall when there is a small number of items in the 
+      // bookmarklist.
+      for (var i=itemlocationdata.length; i--;) {
+        // for items starting on the right side, if the right side of dragged is 
+        // > their middle, send it to the minus position.
+        // for items starting on the left side, if the left side of dragged is 
+        // < their middle, send it to the plus position.
+        // In all other cases just set the position offset to 0.
+        var ii = itemlocationdata[i];
+        if (ii == "dragged") continue;
+        if (ii.wasAfter) {
+          if (offset[0] + dragitemstartx + dragitemwidth > ii.center) {
+            setTransStyle(ii.el, -dragitemwidth, 0);
+          } else {
+            setTransStyle(ii.el, 0, 0);
+          }
+        } else {
+          if (offset[0] + dragitemstartx < ii.center) {
+            setTransStyle(ii.el, dragitemwidth, 0);
+          } else {
+            setTransStyle(ii.el, 0, 0);
+          }
+        }
+      }
+    } else {
+      // move all the "after" items to their minus position because I have 
+      // unsnapped the draggable
+      for (var i=itemlocationdata.length; i--;) {
+        var ii = itemlocationdata[i];
+        if (ii == "dragged") continue;
+        if (ii.wasAfter) {
+          setTransStyle(ii.el, -dragitemwidth, 0);
+        } else {
+          setTransStyle(ii.el, 0, 0);
+        }
+      }
     }
   });
 
   document.addEventListener("mouseup", function(event){
+    if (dragging) dragging.className = "item";
     dragging = false;
     // apply the positioning of all items by actually moving them and zeroing 
     // their transform styles
