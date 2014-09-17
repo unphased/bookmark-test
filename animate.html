@@ -1,0 +1,56 @@
+<!doctype html>
+<title>Bookmark bar</title>
+<meta charset=utf-8>
+<style>
+
+html,
+body
+{
+  font: menu;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+p
+{
+  text-align: center;
+}
+
+#container
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  overflow: hidden;
+}
+
+#target
+{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 80px;
+  height: 80px;
+  background-color: hsl(0, 0%, 50%);
+  transition: left 1s, top 1s;
+}
+
+</style>
+<script>
+
+var set_new_randow_position = function()
+{
+  var ele = document.querySelector("#target");
+  var style = ele.style;
+  style.left = (Math.random() * (window.innerWidth - ele.clientWidth) >> 0) + "px";
+  style.top = (Math.random() * (window.innerHeight - ele.clientHeight) >> 0) + "px";
+};
+
+</script>
+<div id=container>
+  <p><input type=button value="Set new random position" onclick=set_new_randow_position()>
+  <div id=target></div>
+</div>

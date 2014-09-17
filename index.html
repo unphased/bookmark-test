@@ -1,0 +1,54 @@
+<!doctype html>
+<title>JavaScript test</title>
+<meta charset=utf-8>
+<style>
+
+html
+{
+  font: menu;
+  font-size: .8em;
+  max-width: 700px;
+  margin: auto;
+}
+
+h1,
+h2
+{
+  font-weight: normal;
+}
+
+li
+{
+  margin-top: .5em;
+}
+
+</style>
+<h2>Implement moving an item of a bookmark bar.</h2>
+<ul>
+  <li>The bookmark bar shows the items horizontally.
+  <li>Each item has a favicon and a text label.
+  <li>The text label can be empty.
+  <li>The width of each item is given by its favicon and text label, but cannot exceed a given maximum.
+  <li>The items can be rearranged on the bar via drag and drop.
+  <li>If the mouse cursor moves vertically within a given threshold, the dragged item can only be moved horizontally inside the bar.
+  <li>If the mouse cursor moves vertically beyond the given threshold, the dragged item can be moved freely in both directions outside of the bar.
+  <li>When moving an item inside the bar, a gap with the width of the dragged item shows its current target position.
+  <li>If the position of the gap needs to be updated, the other items move to their updated position.
+  <li>If the dragged item is moved outside of the bar, the gap collapses and the positions of the other items are updated.
+  <li>If the item is moved back to the bar, the placeholder is inserted at the correct position and the item can again only be dragged horizontally.
+  <li>If the user releases the item outside of the bar, the gap is inserted at the previous position, and the item moves back to that position.
+  <li>Always use smooth animations to update the positions of the other items.
+  <li>All the interactions should feel natural.
+  <li>Use HTML, CSS, DOM and JS for this task and don't rely on any 3rd party library.
+  <li>Extra: Add another bookmark and move items from one bookmark to the other bookmark
+</ul>
+<h2>Some fragments which may help. Feel free to use or disregard them.</h2>
+<ul>
+  <li><a href=bookmarkbar.html>Stub document</a>
+  <li><a href=drag.html>Example how to drag an element</a>
+  <li><a href=animate.html>Example of an animation</a>
+  <li><a href=item.js>Example of a simple bookmark item class</a>
+</ul>
+
+
+

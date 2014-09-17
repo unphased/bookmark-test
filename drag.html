@@ -1,0 +1,76 @@
+<!doctype html>
+<title>Bookmark bar</title>
+<meta charset=utf-8>
+<style>
+
+html,
+body
+{
+  font: menu;
+  margin: 0;
+  padding: 0;
+  -webkit-user-select: none;
+  height: 100%;
+}
+
+#container
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+#drag-target
+{
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  background-color: hsl(0, 0%, 50%);
+}
+
+</style>
+<script>
+
+window.onload = function()
+{
+  var STANDARD_CLICK = 0;
+
+  var _drag_start = null;
+  var _drag_target = null;
+
+  var _mousedown = function(event)
+  {
+    if (event.target.id == "drag-target" && event.button == STANDARD_CLICK)
+    {
+      _drag_target = event.target;
+      var style = _drag_target.style;
+      _drag_delta = {x: event.clientX - parseInt(style.left),
+                     y: event.clientY - parseInt(style.top)};
+      document.addEventListener("mousemove", _mousemove);
+      document.addEventListener("mouseup", _mouseup);
+      event.preventDefault();
+    }
+  };
+
+  var _mousemove = function(event)
+  {
+    _drag_target.style.left = (event.clientX - _drag_delta.x) + "px";
+    _drag_target.style.top = (event.clientY - _drag_delta.y) + "px";
+  };
+
+  var _mouseup = function(event)
+  {
+    document.removeEventListener("mousemove", _mousemove);
+    document.removeEventListener("mouseup", _mouseup);
+    _drag_start = null;
+    _drag_target = null;
+  };
+
+  document.addEventListener("mousedown", _mousedown);
+};
+
+</script>
+<div id=container><div id=drag-target style="left: 0; top: 0"></div></div>
