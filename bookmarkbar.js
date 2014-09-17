@@ -171,6 +171,9 @@ window.onload = function(){
           clearTransStyle(ii.el);
         }
         clearTransStyle(dragging);
+      } else {
+        // now we gotta do some shuffling around
+
       }
       dragging = false;
       return false;
