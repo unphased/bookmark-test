@@ -26,10 +26,12 @@ function parentIsTag(domelem, tag){
   do {
     if (!domelem || domelem.tagName == tag)
       return domelem;
-  } while(domelem = domelem.parentNode);
+  } while((domelem = domelem.parentNode));
 }
 
 function setTrans(elem, style){
+  // turns out Firefox is satisfied with "transform" style. Only Safari requires 
+  // use of -webkit-transform
   elem.style.transform = elem.style['-webkit-transform'] = style;
 }
 function transStyle(x, y, z){
@@ -39,16 +41,24 @@ function setTransStyle(elem, x, y, z){
   z = z || 0;
   setTrans(elem, transStyle(x, y, z));
 }
+function clearTransStyle(elem){
+  setTrans(elem, "");
+}
+
 
 var snapthreshold = 15; // CSS pixels vertical snap threshold
 
 window.onload = function(){
+  // begin state relevant to dragging li's in the ul
   var dragging;
   var dragitemwidth;
   var dragitemstartx;
   var unsnapped;
   var pos;
-  var itemlocationdata;
+  var itemlocationdata; // this is an example of some state that should have
+                        // better structure but which doesn't because I wanted
+                        // to keep the implementation short and simple
+  // end state relevant to dragging li's in the ul
 
   // I want to use jQuery -- so far I would have used it to double up on the 
   // evenet handlers. For example, when handling only single touch and mouse you
@@ -137,8 +147,8 @@ window.onload = function(){
     } else {
       // move all the "after" items to their minus position because I have 
       // unsnapped the draggable
-      for (var i=itemlocationdata.length; i--;) {
-        var ii = itemlocationdata[i];
+      for (i = itemlocationdata.length; i--;) {
+        ii = itemlocationdata[i];
         if (ii == "dragged") continue;
         if (ii.wasAfter) {
           setTransStyle(ii.el, -dragitemwidth, 0);
@@ -150,10 +160,21 @@ window.onload = function(){
   });
 
   document.addEventListener("mouseup", function(event){
-    if (dragging) dragging.className = "item";
+    if (dragging) {
+      dragging.className = "item";
+      // apply the positioning of all items by actually moving them and 
+      // zeroing/clearing their transform styles
+      if (unsnapped) {
+        for (var i = itemlocationdata.length; i--;) {
+          var ii = itemlocationdata[i];
+          if (ii == "dragged") continue;
+          clearTransStyle(ii.el);
+        }
+        clearTransStyle(dragging);
+      }
+      dragging = false;
+      return false;
+    }
     dragging = false;
-    // apply the positioning of all items by actually moving them and zeroing 
-    // their transform styles
-    return false;
   }, false);
 };
