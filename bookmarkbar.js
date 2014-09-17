@@ -37,8 +37,11 @@ window.onload = function(){
     // possible positions are their current position (0) or dragitemwidth to the
     // right (+diw) if dragging item is before it. For all items originally 
     // after the dragging item, their possible positions are their current 
-    // position (0) or (-diw) if dragging item is after it. We can allow CSS 
+    // position (0) or (-diw) if dragging item is after it. We can use CSS 
     // transitions to tween the transforms of all of the items efficiently.
+    // Note also that the offset values are just diw because no margin exists on
+    // the items. Ordinarily the offset is width+(marginleft+marginright)/2 or 
+    // some such.
     return false;
   }, false);
 
