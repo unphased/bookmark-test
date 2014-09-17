@@ -11,7 +11,6 @@
       font: menu;
       margin: 0;
       padding: 0;
-      -webkit-user-select: none;
     }
 
     #bookmark-bar
@@ -64,8 +63,10 @@
     }
 
     ul {
-      transform-style: preserve-3d;
       /* Needed for Chrome to obey z coverage */
+      transform-style: preserve-3d;
+      -webkit-user-select: none;
+      -moz-user-select: none;
     }
 
     .dragging
