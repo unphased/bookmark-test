@@ -45,6 +45,12 @@ function clearTransStyle(elem){
   setTrans(elem, "");
 }
 
+// helper with very narrow use
+function getTransX(elem) {
+  var style = elem.style.transform || elem.style['-webkit-transform'];
+  return Number(style.match(/translate3d\((-?\d+)px,/)[1]);
+}
+
 var snapthreshold = 15; // CSS pixels vertical snap threshold
 
 window.onload = function(){
@@ -102,8 +108,14 @@ window.onload = function(){
       // BCR coordinates change. This computed difference, however, conveniently 
       // remains constant in CSS-pixels.
       var xBCR = li.getBoundingClientRect();
-      var thisitemcenter = (xBCR.left + xBCR.right)/2 - document.body.getBoundingClientRect().left;
-      return {el: li, wasAfter: thisitemcenter > dragitemstartx, center: thisitemcenter};
+      var bodyBCRl = document.body.getBoundingClientRect().left;
+      var thisitemcenter = (xBCR.left + xBCR.right)/2 - bodyBCRl;
+      return {
+        el: li,
+        wasAfter: thisitemcenter > dragitemstartx,
+        center: thisitemcenter,
+        left: xBCR.left - bodyBCRl
+      };
     });
     dragging.className = "item dragging";
     l('itemlocationdata', itemlocationdata);
@@ -191,19 +203,20 @@ window.onload = function(){
           ii.el.className = "item notransition";
           clearTransStyle(ii.el);
         }
+        var ul = $("ul");
+        l("si,ci, diff", startindex, currentindex, currentindex?(itemlocationdata[currentindex].left - dragitemstartx):"N/A");
+        ul.insertBefore(ul.children[startindex], ul.children[currentindex+1]);
 
         // the only tricky bit is getting the dragged item's animation to behave
         // in a sane fashion -- this requires it to get DOM-moved into place, 
         // with the transform correspondingly warped using notransition class, 
         // and then switched back on and re-transitioned to a transform of zero, 
         // so we do have to do window.getComputedStyle() madness here.
+        dragging.className = "item dragging notransition";
+        var x_right_now = getTransX(dragging);
+        l("xrn",x_right_now);
+        setTransStyle(dragging, itemlocationdata[currentindex].left - dragitemstartx - x_right_now, 0);
 
-        // following comment applies for the non-dragged items...
-        // We can force-apply the styles (allow browser to evaluate styles) 
-        // using window.getComputedStyle(), but since we're done (i.e. no other 
-        // styles need to be set on these elements *right now*), this can also 
-        // be skipped.
-        // The notransition class is eventually cleared; no need to do it here.
       }
       dragging = false;
       return false;
