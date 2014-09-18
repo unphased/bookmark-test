@@ -216,7 +216,8 @@ window.onload = function(){
         // in a sane fashion -- this requires it to get DOM-moved into place, 
         // with the transform correspondingly warped using notransition class, 
         // and then switched back on and re-transitioned to a transform of zero, 
-        // so we do have to do window.getComputedStyle() madness here.
+        // so we do have to do madness here eventually to get a multi step 
+        // animation. This can be done with at least like 3 methods...
         dragging.className = "item dragging notransition";
         var x_right_now = getTransX(dragging);
 
@@ -229,7 +230,13 @@ window.onload = function(){
         var diff_user_target = x_right_now - ((currentindex < startindex) ? left_to_left : right_to_left);
         l("ci,si:", currentindex, startindex,"xrn",x_right_now, "diff of",itemlocationdata[currentindex].el, left_to_left, right_to_left, diff_user_target);
         setTransStyle(dragging, diff_user_target, 0);
-
+        // begin madness necessary for final queued animation
+        var draggingshadow = dragging;
+        setTimeout(function(){
+          draggingshadow.className = "item";
+          setTransStyle(draggingshadow, 0, 0);
+        },0);
+        // end madness
       }
       dragging = false;
       return false;
