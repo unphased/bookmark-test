@@ -71,7 +71,7 @@ window.onload = function(){
   // evenet handlers. For example, when handling only single touch and mouse you
   // can get away with just assigning the same event handlers to mousedown and 
   // touchstart
-  $('ul').addEventListener("mousedown", function(event){
+  $("#bookmark-bar").addEventListener("mousedown", function(event){
     dragging = parentIsTag(event.target, "LI");
     currentindex = -1; // -1 means not dragged far enough to rearrange anything
     if(!dragging) return;
@@ -101,7 +101,7 @@ window.onload = function(){
 
     // cache the layout of the list in a variable once per mouse interaction 
     // (rather than accessing the DOM in a loop once per mouse movement!)
-    itemlocationdata = toArray($('ul').children).map(function(li){
+    itemlocationdata = toArray($("#bookmark-bar").children).map(function(li){
       // ensures notransition is not set on all the li's
       li.className = "item";
       if (li == dragging) return "dragged";
@@ -204,7 +204,7 @@ window.onload = function(){
           ii.el.className = "item notransition";
           clearTransStyle(ii.el);
         }
-        var ul = $("ul");
+        var ul = $("#bookmark-bar");
         l("si,ci, diff", startindex, currentindex, currentindex?(itemlocationdata[currentindex].left - dragitemstartx):"N/A");
         ul.insertBefore(ul.children[startindex], ul.children[currentindex+1]);
 
