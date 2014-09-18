@@ -24,6 +24,12 @@
       padding: 0;
       list-style: none;
       background: hsl(0, 0%, 90%);
+
+      /* Needed for Chrome to obey z coverage */
+      transform-style: preserve-3d;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      cursor: default;
     }
 
     .item
@@ -70,14 +76,6 @@
       top: 3px;
       left: 7px;
       background: hsl(0, 0%, 70%);
-    }
-
-    ul
-    {
-      /* Needed for Chrome to obey z coverage */
-      transform-style: preserve-3d;
-      -webkit-user-select: none;
-      -moz-user-select: none;
     }
 
     .item.dragging
