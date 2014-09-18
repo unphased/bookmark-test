@@ -116,7 +116,8 @@ window.onload = function(){
         el: li,
         wasAfter: thisitemcenter > dragitemstartx,
         center: thisitemcenter,
-        left: xBCR.left - bodyBCRl
+        left: xBCR.left - bodyBCRl,
+        right: xBCR.right - bodyBCRl
       };
     });
     dragging.className = "item dragging";
@@ -225,10 +226,13 @@ window.onload = function(){
         // position of the front of the target item (to go before) with the 
         // RIGHT side of the dragged item. Which means the difference expression 
         // is different.
-        var left_to_left = itemlocationdata[currentindex].left - dragitemstartx;
-        var right_to_left = left_to_left - dragitemwidth;
-        var diff_user_target = x_right_now - ((currentindex < startindex) ? left_to_left : right_to_left);
-        l("ci,si:", currentindex, startindex,"xrn",x_right_now, "diff of",itemlocationdata[currentindex].el, left_to_left, right_to_left, diff_user_target);
+        var finaldelta;
+        if (currentindex < startindex) {
+          finaldelta = itemlocationdata[currentindex].left - dragitemstartx;
+        } else {
+          finaldelta = itemlocationdata[currentindex-1].right - dragitemstartx - dragitemwidth;
+        }
+        var diff_user_target = x_right_now - finaldelta;
         setTransStyle(dragging, diff_user_target, 0);
         // begin madness necessary for final queued animation
         var draggingshadow = dragging;
