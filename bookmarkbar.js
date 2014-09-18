@@ -45,7 +45,7 @@ function clearTransStyle(elem){
   setTrans(elem, "");
 }
 
-// helper with very narrow use
+// helper with rather narrow use
 function getTransX(elem) {
   var style = elem.style.transform || elem.style['-webkit-transform'];
   if (!style) return false;
@@ -64,7 +64,7 @@ window.onload = function(){
   var itemlocationdata; // this is an example of some state that should have
                         // better structure but which doesn't because I wanted
                         // to keep the implementation short and simple
-  var currentindex; // the index that dragging item is poised for insertion at
+  var currentindex; // the index that dragged item is poised for insertion at
   // end state relevant to dragging li's in the ul
 
   // I want to use jQuery -- so far I would have used it to double up on the 
@@ -137,7 +137,7 @@ window.onload = function(){
       // positions have traversed. However, the additional complexity will cause 
       // it to be slower overall when there is a small number of items in the 
       // bookmarklist.
-      var tmpdeleteme = [];
+      var has_caused_item_to_shift = false;
       for (var i=itemlocationdata.length; i--;) {
         // for items starting on the right side, if the right side of dragged is 
         // > their middle, send it to the minus position.
@@ -149,7 +149,8 @@ window.onload = function(){
         if (ii.wasAfter) {
           if (offset[0] + dragitemstartx + dragitemwidth > ii.center) {
             setTransStyle(ii.el, -dragitemwidth, 0);
-            currentindex = currentindex < i ? i : currentindex;
+            currentindex = currentindex < i+1 ? i+1 : currentindex;
+            has_caused_item_to_shift = true;
           } else {
             setTransStyle(ii.el, 0, 0);
           }
@@ -159,10 +160,14 @@ window.onload = function(){
             currentindex = i;
             // not as complicated as the other assignment of currentindex due to
             // the iteration order of the loop
+            has_caused_item_to_shift = true;
           } else {
             setTransStyle(ii.el, 0, 0);
           }
         }
+      }
+      if (!has_caused_item_to_shift) {
+        currentindex = -1;
       }
       l('ci', currentindex);
     } else {
@@ -205,8 +210,7 @@ window.onload = function(){
           clearTransStyle(ii.el);
         }
         var ul = $("#bookmark-bar");
-        l("si,ci, diff", startindex, currentindex, currentindex?(itemlocationdata[currentindex].left - dragitemstartx):"N/A");
-        ul.insertBefore(ul.children[startindex], ul.children[currentindex+1]);
+        ul.insertBefore(ul.children[startindex], ul.children[currentindex]);
 
         // the only tricky bit is getting the dragged item's animation to behave
         // in a sane fashion -- this requires it to get DOM-moved into place, 
@@ -215,8 +219,19 @@ window.onload = function(){
         // so we do have to do window.getComputedStyle() madness here.
         dragging.className = "item dragging notransition";
         var x_right_now = getTransX(dragging);
-        l("xrn",x_right_now);
-        setTransStyle(dragging, itemlocationdata[currentindex].left - dragitemstartx - x_right_now, 0);
+
+        // rather tricky -- if moving to the right we have to compare the 
+        // position of the front of the target item (to go before) with the 
+        // RIGHT side of the dragged item. Which means the difference expression 
+        // is different.
+        var diff_left_dragged_origin_to_target_left = itemlocationdata[currentindex].left - dragitemstartx;
+        var diff_right_dragged_origin_to_target_left = diff_left_dragged_origin_to_target_left - dragitemwidth;
+        //var finalPositionDiff = itemlocationdata[currentindex].left 
+        //- dragitemstartx +
+                                //(currentindex > startindex) ? dragitemwidth 
+        //: 0;
+        l("ci,si:", currentindex, startindex,"xrn",x_right_now, "diff of",itemlocationdata[currentindex].el, diff_left_dragged_origin_to_target_left, diff_right_dragged_origin_to_target_left);
+        setTransStyle(dragging, 0, 0);
 
       }
       dragging = false;
