@@ -48,6 +48,7 @@ function clearTransStyle(elem){
 // helper with very narrow use
 function getTransX(elem) {
   var style = elem.style.transform || elem.style['-webkit-transform'];
+  if (!style) return false;
   return Number(style.match(/translate3d\((-?\d+)px,/)[1]);
 }
 
@@ -72,6 +73,7 @@ window.onload = function(){
   // touchstart
   $('ul').addEventListener("mousedown", function(event){
     dragging = parentIsTag(event.target, "LI");
+    currentindex = -1; // -1 means not dragged far enough to rearrange anything
     if(!dragging) return;
     dragitemwidth = dragging.offsetWidth;
     pos = [event.clientX, event.clientY];
@@ -136,7 +138,6 @@ window.onload = function(){
       // it to be slower overall when there is a small number of items in the 
       // bookmarklist.
       var tmpdeleteme = [];
-      currentindex = -1; // -1 means not dragged far enough to rearrange anything
       for (var i=itemlocationdata.length; i--;) {
         // for items starting on the right side, if the right side of dragged is 
         // > their middle, send it to the minus position.
