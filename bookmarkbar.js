@@ -224,14 +224,11 @@ window.onload = function(){
         // position of the front of the target item (to go before) with the 
         // RIGHT side of the dragged item. Which means the difference expression 
         // is different.
-        var diff_left_dragged_origin_to_target_left = itemlocationdata[currentindex].left - dragitemstartx;
-        var diff_right_dragged_origin_to_target_left = diff_left_dragged_origin_to_target_left - dragitemwidth;
-        //var finalPositionDiff = itemlocationdata[currentindex].left 
-        //- dragitemstartx +
-                                //(currentindex > startindex) ? dragitemwidth 
-        //: 0;
-        l("ci,si:", currentindex, startindex,"xrn",x_right_now, "diff of",itemlocationdata[currentindex].el, diff_left_dragged_origin_to_target_left, diff_right_dragged_origin_to_target_left);
-        setTransStyle(dragging, 0, 0);
+        var left_to_left = itemlocationdata[currentindex].left - dragitemstartx;
+        var right_to_left = left_to_left - dragitemwidth;
+        var diff_user_target = x_right_now - ((currentindex < startindex) ? left_to_left : right_to_left);
+        l("ci,si:", currentindex, startindex,"xrn",x_right_now, "diff of",itemlocationdata[currentindex].el, left_to_left, right_to_left, diff_user_target);
+        setTransStyle(dragging, diff_user_target, 0);
 
       }
       dragging = false;
